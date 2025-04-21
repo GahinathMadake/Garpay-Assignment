@@ -16,7 +16,6 @@ import Payouts from "./pages/Payouts";
 import Promoters from "./pages/Promoters";
 import Leads from "./pages/Leads";
 import Campaign from "./pages/Campaign";
-import TourModal from "./components/app-sidebar";
 
 
 // Context Provider
