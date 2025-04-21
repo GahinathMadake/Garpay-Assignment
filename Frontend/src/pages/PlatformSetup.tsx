@@ -6,58 +6,176 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState } from "react"
 import { Separator } from "@/components/ui/separator"
 import { Check } from "lucide-react"
+import { useEffect } from 'react'
+import { useBreadcrumb } from '@/context/BreaderCrumbContext'
+
+
 
 export default function BusinessSetupDashboard() {
-    const [currentSetup, setCurrentSetup] = useState<number>(1)
+  const [currentSetup, setCurrentSetup] = useState<number>(1);
+
+  const { addItem, clearItems } = useBreadcrumb()
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 3000) // 3 seconds delay
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      clearItems()
+      addItem({ url: location.pathname, name: 'Platform Setup' }) // or dynamic name
+    }, 0)
+  }, [location.pathname])
+  
+
+  const progress = [
+    "Set Up Business Profile",
+    "Sync Your Customer Data",
+    "Set Up AI Agent Rules",
+    "Set Up First Campaign"
+  ]
+
+  // Animation variants (reusable)
+  const slideIn = {
+    initial: { opacity: 0, x: 80 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -80 },
+    transition: { duration: 0.4 }
+  }
 
 
-    const progress = ["Set Up Business Profile", "Sync Your Customer Data", "Set Up AI Agent Rules", "Set Up First Campaign"]
+  if (loading) return <BusinessSetupDashboardSkeleton />
+
   return (
-    <div className="flex flex-wrap min-h-screen bg-sidebar p-6 rounded-xl">
-      {/* Left Sidebar */}
-      <div className="w-[325px] bg-white p-6 rounded-xl shadow-sm">
+    <div className="flex min-h-screen bg-sidebar p-6 rounded-xl">
+      {/* Sidebar */}
+      <motion.div
+        className="w-[325px] bg-white p-6 rounded-xl shadow-sm"
+        initial={{ opacity: 0, x: -60 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <h2 className="text-lg font-semibold text-primary">Get Started with ReferralHub</h2>
         <p className="text-sm text-muted-foreground mt-2">
           To get started with better referrals & rewards, complete your account setup in a few easy steps.
         </p>
 
-        <Separator className="my-4"/>
+        <Separator className="my-4" />
 
         <div className="space-y-6 mt-6">
           {progress.map((step, index) => (
-            <div key={step} className="flex flex-wrap items-center gap-3">
-              {
-                    index+1<currentSetup ? (
-                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                  ) : index+1===currentSetup ? (
-                    <div className="relative w-6 h-6">
-                      <div className="w-6 h-6 rounded-full border-2 border-blue-500 flex items-center justify-center">
-                        <div className="w-3 h-3 rounded-full bg-blue-500" />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-6 h-6 rounded-full border border-gray-400" />
-                  )
-              }
+            <motion.div
+              key={step}
+              className="flex items-center gap-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              {index + 1 < currentSetup ? (
+                <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                  <Check className="w-4 h-4 text-white" />
+                </div>
+              ) : index + 1 === currentSetup ? (
+                <div className="relative w-6 h-6">
+                  <div className="w-6 h-6 rounded-full border-2 border-blue-500 flex items-center justify-center">
+                    <div className="w-3 h-3 rounded-full bg-blue-500" />
+                  </div>
+                </div>
+              ) : (
+                <div className="w-6 h-6 rounded-full border border-gray-400" />
+              )}
               <div className="min-w-[200px]">
                 <p className="font-medium text-md">{step}</p>
-                <p className={`text-sm font-semibold bold ${index+1>currentSetup?"text-gray-400": index+1===currentSetup?"text-blue-500":"text-green-500"}`}>{index+1>currentSetup ? "Not Started": index+1===currentSetup? "In Progress" : "Completed"}</p>
+                <p className={`text-sm font-semibold ${index + 1 > currentSetup
+                  ? "text-gray-400"
+                  : index + 1 === currentSetup
+                    ? "text-blue-500"
+                    : "text-green-500"
+                  }`}>
+                  {index + 1 > currentSetup
+                    ? "Not Started"
+                    : index + 1 === currentSetup
+                      ? "In Progress"
+                      : "Completed"}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Right Side Dynamic Panel */}
+      <div className="flex-1 ml-6">
+        {currentSetup === 1 && (
+          <motion.div {...slideIn} className="h-full w-full">
+            <CountStep1 setCurrentSetup={setCurrentSetup} />
+          </motion.div>
+        )}
+        {currentSetup === 2 && (
+          <motion.div {...slideIn} className="h-full w-full">
+            <CountStep2 setCurrentSetup={setCurrentSetup} />
+          </motion.div>
+        )}
+        {currentSetup === 3 && (
+          <motion.div {...slideIn} className="h-full w-full">
+            <CountSetup3 setCurrentSetup={setCurrentSetup} />
+          </motion.div>
+        )}
+        {currentSetup === 4 && (
+          <motion.div {...slideIn} className="h-full w-full">
+            <CountStep4 setCurrentSetup={setCurrentSetup} />
+          </motion.div>
+        )}
+        {currentSetup === 5 && (
+          <motion.div {...slideIn} className="h-full w-full">
+            <SetupComplete setCurrentSetup={setCurrentSetup} />
+          </motion.div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+
+// components/Dashboard/BusinessSetupDashboardSkeleton.tsx
+import { Skeleton } from "@/components/ui/skeleton"
+
+export function BusinessSetupDashboardSkeleton() {
+  return (
+    <div className="flex min-h-screen bg-sidebar p-6 rounded-xl">
+      {/* Sidebar */}
+      <div className="w-[325px] bg-white p-6 rounded-xl shadow-sm space-y-6">
+        <Skeleton className="h-6 w-3/4" />
+        <Skeleton className="h-4 w-full" />
+        <Separator className="my-4" />
+        
+        <div className="space-y-4 mt-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="flex items-start gap-3">
+              <Skeleton className="w-6 h-6 rounded-full" />
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-3 w-24" />
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Right Main Form */}
-      { currentSetup===1 && <CountStep1 setCurrentSetup={setCurrentSetup} />}
-      { currentSetup===2 && <CountStep2 setCurrentSetup={setCurrentSetup} />}
-      { currentSetup===3 && <CountSetup3 setCurrentSetup={setCurrentSetup} />}
-      { currentSetup===4 && <CountStep4 setCurrentSetup={setCurrentSetup} />}
+      {/* Right Panel Skeleton */}
+      <div className="flex-1 ml-6 space-y-4">
+        <Skeleton className="h-10 w-1/3" />
+        <Skeleton className="h-80 w-full rounded-xl" />
+        <Skeleton className="h-10 w-1/4" />
+      </div>
     </div>
   )
 }
+
 
 
 
@@ -520,7 +638,7 @@ export const CountStep4: React.FC<CountStepProps>  = ({setCurrentSetup}) => {
 
         <Button
             onClick={()=>{
-                setCurrentSetup(3);
+                setCurrentSetup(5);
             }}
             className="w-full py-2 rounded bg-gradient-to-r from-blue-600 to-blue-300 text-white font-semibold hover:opacity-90 transition"
         > 
@@ -529,5 +647,57 @@ export const CountStep4: React.FC<CountStepProps>  = ({setCurrentSetup}) => {
     </div>
   );
 };
+
+
+
+import { CheckCircle2, PartyPopper } from "lucide-react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+
+export const SetupComplete: React.FC<CountStepProps> = () => {
+  return (
+    <div className="h-full flex flex-col justify-center items-center ">
+      <motion.div
+      className="flex flex-col justify-center items-center max-w-xl bg-gradient-to-br from-blue-50 via-white to-blue-100 rounded-xl p-6 md:p-10 shadow-xl animate-fadeIn"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
+      <motion.div
+        className="text-blue-600 mb-6"
+        initial={{ scale: 0.8 }}
+        animate={{ scale: [1, 1.2, 1] }}
+        transition={{
+          duration: 1,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        <PartyPopper size={64} strokeWidth={1.5} />
+      </motion.div>
+
+      <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+        🎉 You’re All Set!
+      </h2>
+
+      <p className="text-base md:text-lg text-gray-600 max-w-lg text-center mb-6">
+        You’ve successfully completed your platform setup. Let’s unlock better referrals & rewards with <span className="text-blue-600 font-semibold">ReferralHub</span>.
+      </p>
+
+      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-sm md:text-base font-semibold shadow-lg transition duration-200"
+        >
+          <CheckCircle2 size={20} />
+          Get Started
+        </Link>
+      </motion.div>
+    </motion.div>
+    </div>
+  );
+};
+
+
 
 

@@ -34,12 +34,12 @@ export default function Page() {
       <SidebarInset>
         <header className=" top-0 py-2 px-10 border-b bg-white">
           <div className="w-full flex justify-between gap-2 px-4">
-            <Breadcrumb>
+            <Breadcrumb className='flex items-center'>
                 <BreadcrumbList>
                     {items.map((item, index) => (
                         <React.Fragment key={item.url}>
                         <BreadcrumbItem className={index > 0 ? "hidden md:block" : ""}>
-                            <BreadcrumbLink href={item.url}>{item.name}</BreadcrumbLink>
+                            <BreadcrumbLink href={item.url} className='text-md font-semibold'>{item.name}</BreadcrumbLink>
                         </BreadcrumbItem>
                         {index < items.length - 1 && <BreadcrumbSeparator />}
                         </React.Fragment>

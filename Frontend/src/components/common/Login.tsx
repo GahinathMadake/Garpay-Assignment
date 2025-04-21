@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FaGoogle, FaFacebookF, FaXTwitter, FaLinkedinIn } from "react-icons/fa6";
 import logo from '@/assets/logo.png'
@@ -37,9 +37,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen py-10 flex items-center justify-center bg-gray-100 px-4">
-      <Card className="w-full max-w-md">
-        <CardContent className="p-6 space-y-6">
+      <div className="w-full max-w-md">
+        <CardContent className="py-6 px-0 space-y-6">
           <div className="text-center">
             <img className="mx-auto w-20" src={logo} alt="logo" />
             <h2 className="text-2xl font-semibold mt-2">Login to ReferralHub</h2>
@@ -113,9 +112,9 @@ export default function Login() {
             </div>
 
             <Link to={'/dashboard'}>
-            <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-indigo-300 text-white">
-              Login
-            </Button>
+              <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-indigo-300 text-white">
+                Login
+              </Button>
             </Link>
           </form>
 
@@ -133,7 +132,6 @@ export default function Login() {
             </Link>
           </p>
         </CardContent>
-      </Card>
-    </div>
+      </div>
   );
 }

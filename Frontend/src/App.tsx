@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // common Pages
+import AuthenticateLayout from "./pages/Authentication/LoginRegistration";
 import LandingPage from "./pages/LandingPage";
 import Login from "./components/common/Login";
 import Register from "./components/common/Register";
@@ -15,6 +16,7 @@ import Payouts from "./pages/Payouts";
 import Promoters from "./pages/Promoters";
 import Leads from "./pages/Leads";
 import Campaign from "./pages/Campaign";
+import TourModal from "./components/app-sidebar";
 
 
 // Context Provider
@@ -27,9 +29,9 @@ function App() {
       <Router>
         <Routes>
           <Route index element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/login/forgotpassword" element={<ForgotPassword />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<AuthenticateLayout><Login /></AuthenticateLayout>} />
+          <Route path="/login/forgotpassword" element={<AuthenticateLayout><ForgotPassword /></AuthenticateLayout>} />
+          <Route path="/register" element={<AuthenticateLayout><Register /></AuthenticateLayout>} />
           <Route path="/dashboard" element={ <BreadcrumbProvider><DashboardLayout /></BreadcrumbProvider>}>
             <Route index element={<Dashboard />}/>
             <Route path="platform-setup" element={<BusinessSetupDashboard />}/>

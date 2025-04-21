@@ -1,17 +1,22 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-const metrics = [
-  { title: "Total Promoters", value: "1,234", change: "+12%", note: "vs last month", color: "text-green-600" },
-  { title: "Conversion rate", value: "23.5%", change: "-2.4%", note: "vs last month", color: "text-red-500" },
-  { title: "Revenue Generated", value: "$12,345", change: "+8.7%", note: "vs last month", color: "text-green-600" },
-  { title: "Active Campaigns", value: "3", change: "", note: "", color: "text-gray-700" },
-]
+import { useEffect, useState } from 'react'
+import { useBreadcrumb } from '@/context/BreaderCrumbContext'
+import { useLocation } from 'react-router-dom';
+import { HiUsers } from "react-icons/hi2";
+import { FileChartColumnIncreasing } from 'lucide-react';
+import { FaMoneyBill1Wave } from "react-icons/fa6";
+import { PiUserSoundLight } from "react-icons/pi";
+import MetricCard from "./Dashboard/InitialCard";
+import QuickStatsSection from "./Dashboard/CircularProgress";
+import { Performance } from "./Dashboard/Performance";
+import { Increase } from "./Dashboard/IncrementRate";
 
-const quickStats = [
-  { label: "Repeat Referral Rate", percent: 42, color: "text-green-500", strokeColor: "stroke-green-500" },
-  { label: "Referral Engagement Rate", percent: 67, color: "text-red-400", strokeColor: "stroke-red-400" },
-  { label: "Churn Rate of Leads", percent: 28, color: "text-blue-400", strokeColor: "stroke-blue-400" },
-  { label: "Upsell Rate of Leads", percent: 19, color: "text-pink-400", strokeColor: "stroke-pink-400" },
+const metrics = [
+  { title: "Total Promoters", value: 1234, change: "+12%", note: "vs last month", color: "text-green-600", icon:HiUsers },
+  { title: "Conversion rate", value: 23.5, change: "-2.4%", note: "vs last month", color: "text-red-500", icon:FileChartColumnIncreasing },
+  { title: "Revenue Generated in $", value: 12345, change: "+8.7%", note: "vs last month", color: "text-green-600", icon:FaMoneyBill1Wave},
+  { title: "Active Campaigns", value: 3, change: "+12%", note: "owr value", color: "text-gray-700", icon:PiUserSoundLight },
 ]
 
 
@@ -40,72 +45,40 @@ const leaderboard = [
 ]
 
 export default function Dashboard() {
-  const size = 80;
-  const strokeWidth = 8;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
+
+const { addItem, clearItems } = useBreadcrumb()
+const location = useLocation()
+
+useEffect(() => {
+  setTimeout(() => {
+    clearItems()
+    addItem({ url: location.pathname, name: 'Dashboard' }) // or dynamic name
+  }, 0)
+}, [location.pathname])
+
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 3000) // 3 seconds delay
+
+    return () => clearTimeout(timer)
+  }, [])
+
+if (loading) return <DashboardSkeleton />
 
   return (
     <div className="space-y-6">
       {/* Metrics cards - unchanged */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {metrics.map((m) => (
-          <Card key={m.title}>
-            <CardContent className="p-4 space-y-1">
-              <div className="text-sm text-muted-foreground">{m.title}</div>
-              <div className="text-xl font-semibold">{m.value}</div>
-              <div className={`text-xs ${m.color}`}>{m.change} {m.note}</div>
-            </CardContent>
-          </Card>
-        ))}
+      {metrics.map((m) => (
+            <MetricCard key={m.title} m={m} />
+          ))}
       </div>
 
       {/* Quick Stats with corrected circular progress */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {quickStats.map((s) => {
-          const strokeDashoffset = circumference - (s.percent / 100) * circumference;
-          
-          return (
-            <Card key={s.label}>
-              <CardContent className="p-4 space-y-2 flex flex-col items-center">
-                <div className="text-sm text-muted-foreground text-center">{s.label}</div>
-                
-                <div className="relative" style={{ width: size, height: size }}>
-                  <svg className="w-full h-full" viewBox={`0 0 ${size} ${size}`}>
-                    {/* Background circle */}
-                    <circle
-                      cx={size / 2}
-                      cy={size / 2}
-                      r={radius}
-                      fill="none"
-                      className="stroke-gray-200"
-                      strokeWidth={strokeWidth}
-                    />
-                    {/* Progress circle */}
-                    <circle
-                      cx={size / 2}
-                      cy={size / 2}
-                      r={radius}
-                      fill="none"
-                      className={s.strokeColor}
-                      strokeWidth={strokeWidth}
-                      strokeDasharray={circumference}
-                      strokeDashoffset={strokeDashoffset}
-                      strokeLinecap="round"
-                      transform={`rotate(-90 ${size / 2} ${size / 2})`}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className={`text-lg font-medium ${s.color}`}>
-                      {s.percent}%
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      <QuickStatsSection />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="md:col-span-2">
@@ -118,7 +91,9 @@ export default function Dashboard() {
                 </TabsList>
               </Tabs>
             </div>
-            <div className="h-40 bg-gray-100 rounded flex items-center justify-center text-muted-foreground text-sm">Chart Placeholder</div>
+
+            <Performance />
+            
           </CardContent>
         </Card>
 
@@ -126,15 +101,16 @@ export default function Dashboard() {
           <Card>
             <CardContent className="px-4">
               <div className="text-sm mb-2">Conversion Success Rate</div>
-              <div className="h-32 bg-gray-100 rounded flex items-center justify-center text-muted-foreground text-sm">Pie Chart Placeholder</div>
+              <Increase />
             </CardContent>
           </Card>
-          <Card>
+
+          <Card className="py-4">
             <CardContent className="px-4 space-y-2">
-              <div className="text-sm">Top Performing Channel</div>
+              <div className="text-md mb-2 font-semibold">Top Performing Channel</div>
               <div className="flex flex-wrap gap-3">
                 {channels.map((c) => (
-                  <div key={c.name} className={`text-center text-sm px-6 py-4 rounded ${c.color}`}>
+                  <div key={c.name} className={`text-center text-sm px-7 py-4 rounded ${c.color}`}>
                     <p>{c.name}</p>
                     <p>{c.percent}%</p>
                   </div>
@@ -145,7 +121,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <Card>
+      <Card className="px-4">
         <CardContent className="px-4">
           <h3 className="text-md font-semibold mb-2">Recent Activities</h3>
           <div className="grid grid-cols-3 text-sm font-medium text-muted-foreground mb-1">
@@ -192,4 +168,109 @@ export default function Dashboard() {
       </Card>
     </div>
   )
+}
+
+
+
+import { Skeleton } from "@/components/ui/skeleton";
+
+export function DashboardSkeleton() {
+  return (
+    <div className="space-y-6">
+
+      {/* Metric Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i} className="p-4">
+            <Skeleton className="h-6 w-1/3 mb-2" />
+            <Skeleton className="h-8 w-2/3 mb-1" />
+            <Skeleton className="h-4 w-1/2" />
+          </Card>
+        ))}
+      </div>
+
+      {/* Quick Stats Skeleton */}
+      <Card>
+        <CardContent className="flex gap-6 flex-wrap justify-around py-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex flex-col items-center space-y-2">
+              <Skeleton className="h-24 w-24 rounded-full" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Performance + Side Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="md:col-span-2">
+          <CardContent className="p-4">
+            <Skeleton className="h-6 w-1/3 mb-4" />
+            <Skeleton className="h-64 w-full" />
+          </CardContent>
+        </Card>
+
+        <div className="flex flex-col gap-4">
+          <Card className="p-4">
+            <Skeleton className="h-6 w-2/3 mb-2" />
+            <Skeleton className="h-32 w-full" />
+          </Card>
+          <Card className="p-4">
+            <Skeleton className="h-6 w-1/2 mb-2" />
+            <div className="flex gap-2 flex-wrap">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 w-24 rounded" />
+              ))}
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      {/* Recent Activities */}
+      <Card className="px-4">
+        <CardContent className="px-4">
+          <Skeleton className="h-6 w-1/3 mb-4" />
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="grid grid-cols-3 gap-4 py-3 border-t">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Leaderboard Table */}
+      <Card>
+        <CardContent className="px-4">
+          <Skeleton className="h-6 w-1/3 mb-4" />
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm border">
+              <thead>
+                <tr>
+                  {["Rank", "Name", "Rate", "Sent", "Conv", "Revenue"].map((i) => (
+                    <th key={i} className="p-2">
+                      <Skeleton className="h-4 w-16" />
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 5 }).map((_, rowIdx) => (
+                  <tr key={rowIdx} className="border-t">
+                    {Array.from({ length: 6 }).map((_, cellIdx) => (
+                      <td key={cellIdx} className="p-2">
+                        <Skeleton className="h-4 w-20" />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+    </div>
+  );
 }

@@ -1,5 +1,5 @@
 
-import { Eye } from 'lucide-react';
+import { Award, AwardIcon, CalendarDays, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -11,10 +11,12 @@ import {
     TableHeader,
     TableRow,
   } from "@/components/ui/table";
-  import { Badge } from "@/components/ui/badge";
-  import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useEffect, useState } from 'react'
+import { useBreadcrumb } from '@/context/BreaderCrumbContext'
+import { useLocation } from 'react-router-dom'
 
 const payoutStatusColor: Record<'Paid' | 'Disputed', string> = {
   Paid: 'bg-green-100 text-green-700',
@@ -102,45 +104,81 @@ const disputes = [
 
 
 export default function PayoutsTable() {
+
+  const { addItem, clearItems } = useBreadcrumb()
+    const location = useLocation()
+    useEffect(() => {
+      setTimeout(() => {
+        clearItems()
+        addItem({ url: location.pathname, name: 'Your Payouts' }) // or dynamic name
+      }, 0)
+    }, [location.pathname])
+
+    const [loading, setLoading] = useState(true)
+    
+        useEffect(() => {
+          const timer = setTimeout(() => {
+            setLoading(false)
+          }, 3000)
+    
+          return () => clearTimeout(timer)
+        }, [])
+
+        if(loading){
+          return <PayoutSkeleton />
+        }
+
+
   return (
     <div className="p-6">
 
-<div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+      
       {/* Total Points Given */}
-      <Card className="hover:shadow-md transition-shadow">
-        <CardHeader>
-          <CardTitle className="text-sm font-medium text-gray-500">
+      <div className="flex items-center gap-4 p-4 bg-white rounded-xl border shadow hover:shadow-lg transition-shadow">
+        {/* Icon Section */}
+        <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
+          <Award className="w-6 h-6" />
+        </div>
+
+        {/* Text Section */}
+        <div>
+          <div className="text-sm font-medium text-gray-500 mt-2">
             Total Points Given
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-3xl font-bold">12,500</p>
-        </CardContent>
-      </Card>
+          </div>
+          <p className="text-xl font-bold text-gray-900">12,500</p>
+        </div>
+      </div>
 
-      {/* Current Point Balance */}
-      <Card className="hover:shadow-md transition-shadow">
-        <CardHeader>
-          <CardTitle className="text-sm font-medium text-gray-500">
-            Current Point Balance
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-3xl font-bold">1,250</p>
-        </CardContent>
-      </Card>
+      <div className="flex items-center gap-4 p-4 bg-white rounded-xl border shadow hover:shadow-lg transition-shadow">
+        {/* Icon Section */}
+        <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
+          <CalendarDays className="w-6 h-6" />
+        </div>
 
-      {/* Last Points Transfer */}
-      <Card className="hover:shadow-md transition-shadow">
-        <CardHeader>
-          <CardTitle className="text-sm font-medium text-gray-500">
-            Last Points Transfer
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-3xl font-bold">April 9, 2025</p>
-        </CardContent>
-      </Card>
+        {/* Text Section */}
+        <div>
+          <div className="text-sm font-medium text-gray-500 mt-2">
+          Last Points Transfer
+          </div>
+          <p className="text-xl font-bold text-gray-900">29 April, 2025</p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4 p-4 bg-white rounded-xl border shadow hover:shadow-lg transition-shadow">
+        {/* Icon Section */}
+        <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
+          <AwardIcon className="w-6 h-6" />
+        </div>
+
+        {/* Text Section */}
+        <div>
+          <div className="text-sm font-medium text-gray-500 mt-2">
+          Current Point Balance
+          </div>
+          <p className="text-xl font-bold text-gray-900">1,250</p>
+        </div>
+      </div>
     </div>
 
       {/* Tabs */}
@@ -315,3 +353,125 @@ export default function PayoutsTable() {
     </div>
   );
 }
+
+
+import { Skeleton } from "@/components/ui/skeleton"
+
+export function PayoutSkeleton() {
+  return (
+    <div className="p-6">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex items-center gap-4 p-4 bg-white rounded-xl border shadow">
+            <Skeleton className="w-10 h-10 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="w-24 h-4" />
+              <Skeleton className="w-32 h-6" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tabs */}
+      <Tabs defaultValue="all">
+        <TabsList className="mb-4">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="w-24 h-8 rounded-md mx-1" />
+          ))}
+        </TabsList>
+
+        {/* Search & Filter */}
+        <div className="flex justify-between items-center mb-4">
+          <Skeleton className="h-10 w-64 rounded-md" />
+          <Skeleton className="h-10 w-24 rounded-md" />
+        </div>
+
+        {/* Table Skeleton */}
+        <TabsContent value="all">
+          <div className="rounded-xl border overflow-auto">
+            <Skeleton className="h-8 w-32 mb-4" />
+            <table className="w-full">
+              <thead>
+                <tr>
+                  {[...Array(7)].map((_, i) => (
+                    <th key={i} className="px-4 py-2">
+                      <Skeleton className="h-4 w-24" />
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[...Array(5)].map((_, rowIndex) => (
+                  <tr key={rowIndex} className="border-t">
+                    {[...Array(7)].map((_, colIndex) => (
+                      <td key={colIndex} className="px-4 py-3">
+                        <Skeleton className="h-4 w-full" />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="disputes">
+          <div className="space-y-4 p-6">
+            <Skeleton className="h-6 w-32" />
+            <div className="rounded-lg border">
+              <table className="min-w-full">
+                <thead>
+                  <tr>
+                    {[...Array(7)].map((_, i) => (
+                      <th key={i} className="px-4 py-3">
+                        <Skeleton className="h-4 w-24" />
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...Array(4)].map((_, i) => (
+                    <tr key={i}>
+                      {[...Array(7)].map((_, j) => (
+                        <td key={j} className="px-4 py-3">
+                          <Skeleton className="h-4 w-full" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="settings">
+          <div className="space-y-6 py-6">
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-4 w-60" />
+            <Skeleton className="h-6 w-60" />
+
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-10 w-72" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+
+            <div className="space-y-4">
+              <Skeleton className="h-6 w-40" />
+              <div className="flex flex-wrap gap-4">
+                {[...Array(4)].map((_, i) => (
+                  <Skeleton key={i} className="h-6 w-40 rounded-md" />
+                ))}
+              </div>
+            </div>
+
+            <Skeleton className="h-10 w-40 mt-4" />
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
+

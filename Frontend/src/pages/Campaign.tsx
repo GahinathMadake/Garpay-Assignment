@@ -1,8 +1,35 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useEffect } from 'react'
+import { useBreadcrumb } from '@/context/BreaderCrumbContext'
+import { useLocation } from 'react-router-dom'
 
 const Campaign = () => {
     const [activeTab, setActiveTab] = useState<string>('Past Promoters');
+    
+    const { addItem, clearItems } = useBreadcrumb()
+    const location = useLocation()
+    useEffect(() => {
+      setTimeout(() => {
+        clearItems()
+        addItem({ url: location.pathname, name: 'Create & Manage Referral Campaigns' }) // or dynamic name
+      }, 0)
+    }, [location.pathname])
+
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setLoading(false)
+      }, 3000)
+
+      return () => clearTimeout(timer)
+    }, [])
+
+
+    if(loading){
+      return <CampaignSkeleton />
+    }
 
   return (
     <div>
@@ -386,6 +413,72 @@ export function NewLeads() {
   );
 }
 
+
+import { Skeleton } from "@/components/ui/skeleton";
+
+export const CampaignSkeleton = () => {
+  return (
+    <div>
+      {/* Tabs */}
+      <div className="space-x-2 p-1 w-fit bg-muted rounded-xs">
+        <Skeleton className="rounded-xs py-6 px-20 h-12 w-40 inline-block" />
+        <Skeleton className="rounded-xs py-6 px-20 h-12 w-40 inline-block" />
+        <Skeleton className="rounded-xs py-6 px-20 h-12 w-40 inline-block" />
+      </div>
+
+      {/* Tab content */}
+      <div className='w-full flex-wrap flex justify-center gap-20 items-center mt-5'>
+        <div className="w-5/12 border p-4 mt-5 space-y-4">
+          {/* Title Placeholder */}
+          <Skeleton className="h-6 w-1/3" />
+          <Skeleton className="h-4 w-1/2" />
+          
+          {/* List/Table like loading */}
+          <div className="space-y-4">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="flex items-center space-x-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-6 w-1/2" />
+                  <Skeleton className="h-6 w-1/4" />
+                </div>
+                <Skeleton className="h-8 w-16 rounded-md" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="w-5/12 border p-4 mt-5 space-y-4">
+          {/* Title Placeholder */}
+          <Skeleton className="h-6 w-1/3" />
+          <Skeleton className="h-4 w-1/2" />
+          
+          {/* List/Table like loading */}
+          <div className="space-y-4">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="flex items-center space-x-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-6 w-1/2" />
+                  <Skeleton className="h-6 w-1/4" />
+                </div>
+                <Skeleton className="h-8 w-16 rounded-md" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full border p-4 mt-5 space-y-4">
+        <Skeleton className="h-6 w-1/3" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
+        <Skeleton className="h-4 w-4/6" />
+      </div>
+    </div>
+  );
+};
 
 
 

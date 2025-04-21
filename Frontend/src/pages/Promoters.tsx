@@ -1,6 +1,9 @@
-import { Card, CardContent } from '@/components/ui/card';
+import { Card,} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Eye, MessageCircle, Share2 } from 'lucide-react';
+import { useEffect, useState } from 'react'
+import { useBreadcrumb } from '@/context/BreaderCrumbContext'
+import { useLocation } from 'react-router-dom'
 
 const promoterData = [
     {
@@ -86,6 +89,31 @@ const statusColors = {
 type PromoterStatus = 'Active' | 'Inactive' | 'Completed';
 
 export default function PromoterDashboard() {
+
+  const { addItem, clearItems } = useBreadcrumb()
+    const location = useLocation()
+    useEffect(() => {
+      setTimeout(() => {
+        clearItems()
+        addItem({ url: location.pathname, name: 'Your Promotors' }) // or dynamic name
+      }, 0)
+    }, [location.pathname])
+
+
+      const [loading, setLoading] = useState(true)
+      useEffect(() => {
+        const timer = setTimeout(() => {
+          setLoading(false)
+        }, 3000) // 3 seconds delay
+    
+        return () => clearTimeout(timer)
+      }, [])
+    
+
+      if(loading){
+        return <PromoterDashboardSkeleton />
+      }
+  
   return (
     <div className="p-4 space-y-4">
       <div className="flex flex-wrap gap-2">
@@ -96,33 +124,33 @@ export default function PromoterDashboard() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
+        <Card className='px-4'>
+          <div className="">
             <p className="text-sm text-gray-500">Total Customers</p>
             <p className="text-lg font-semibold">8</p>
             <p className="text-xs text-green-600">+12% vs last month</p>
-          </CardContent>
+          </div>
         </Card>
-        <Card>
-          <CardContent className="p-4">
+        <Card className='px-4'>
+          <div >
             <p className="text-sm text-gray-500">New Customers</p>
             <p className="text-lg font-semibold">94</p>
             <p className="text-xs text-green-600">+8% vs last month</p>
-          </CardContent>
+          </div>
         </Card>
-        <Card>
-          <CardContent className="p-4">
+        <Card className='px-4'>
+          <div>
             <p className="text-sm text-gray-500">Average Conversion rate</p>
             <p className="text-lg font-semibold">64%</p>
             <p className="text-xs text-red-500">-3% vs last month</p>
-          </CardContent>
+          </div>
         </Card>
-        <Card>
-          <CardContent className="p-4">
+        <Card className='px-4'>
+          <div>
             <p className="text-sm text-gray-500">Total Revenue Generated</p>
             <p className="text-lg font-semibold">$23,900</p>
             <p className="text-xs text-green-600">+15% vs last month</p>
-          </CardContent>
+          </div>
         </Card>
       </div>
 
@@ -175,6 +203,61 @@ export default function PromoterDashboard() {
                       <Share2 className="w-4 h-4" />
                     </Button>
                   </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+
+
+import { Skeleton } from "@/components/ui/skeleton";
+
+export function PromoterDashboardSkeleton() {
+  return (
+    <div className="p-4 space-y-4">
+      {/* Top buttons */}
+      <div className="flex flex-wrap gap-2">
+        <Skeleton className="h-10 w-40 rounded-md" />
+        <Skeleton className="h-10 w-64 rounded-md" />
+      </div>
+
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, idx) => (
+          <Card key={idx} className="p-4 space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-6 w-20" />
+            <Skeleton className="h-3 w-32" />
+          </Card>
+        ))}
+      </div>
+
+      {/* Table Skeleton */}
+      <Card className="rounded-2xl shadow-md overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm text-left">
+            <thead className="bg-gray-100 text-xs uppercase text-gray-600">
+              <tr>
+                {[...Array(9)].map((_, idx) => (
+                  <th key={idx} className="p-4">
+                    <Skeleton className="h-4 w-20" />
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[...Array(6)].map((_, idx) => (
+                <tr key={idx} className="border-t hover:bg-gray-50 transition-all">
+                  {[...Array(9)].map((__, colIdx) => (
+                    <td key={colIdx} className="p-4">
+                      <Skeleton className="h-4 w-full" />
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>

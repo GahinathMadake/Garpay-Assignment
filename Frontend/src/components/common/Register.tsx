@@ -32,14 +32,13 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted p-4">
-      <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-md">
+      <div className="w-full max-w-md">
         <div className="text-center mb-10">
             <img className="mx-auto w-20" src={logo} alt="logo" />
             <h2 className="text-2xl font-semibold mt-2">Register for ReferralHub</h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="email">Email Id</Label>
             <Input
@@ -119,12 +118,11 @@ const Register: React.FC = () => {
 
         <p className="text-sm text-center text-muted-foreground">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-500 hover:underline">
+          <Link to="/login" className="text-blue-500 hover:underline">
             Login
-          </a>
+          </Link>
         </p>
       </div>
-    </div>
   );
 };
 

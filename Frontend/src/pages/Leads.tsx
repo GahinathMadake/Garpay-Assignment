@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
+import { useEffect } from 'react'
+import { useBreadcrumb } from '@/context/BreaderCrumbContext'
+import { useLocation } from 'react-router-dom'
 
 const leadsData = [
   { name: 'Emery Dokidis', email: 'emerydoki@gmail.com', contact: '+979970174715', coupon: 'SAVE10NOW', status: 'Pending' },
@@ -19,11 +22,35 @@ const leadsData = [
 export default function LeadsTable() {
   const [selected, setSelected] = useState<number[]>([0, 1]);
 
+  const { addItem, clearItems } = useBreadcrumb()
+    const location = useLocation()
+    useEffect(() => {
+      setTimeout(() => {
+        clearItems()
+        addItem({ url: location.pathname, name: 'Your Leads' }) // or dynamic name
+      }, 0)
+    }, [location.pathname])
+
   const toggleSelect = (index: number) => {
     setSelected((prev) =>
       prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
     );
   };
+
+
+  const [loading, setLoading] = useState(true)
+      
+          useEffect(() => {
+            const timer = setTimeout(() => {
+              setLoading(false)
+            }, 3000)
+      
+            return () => clearTimeout(timer)
+          }, [])
+  
+          if(loading){
+            return <LeadsSkelton />
+          }
 
   return (
     <div className="p-6">
@@ -86,4 +113,59 @@ export default function LeadsTable() {
       </div>
     </div>
   );
+}
+
+
+export const LeadsSkelton = ()=>{
+  return <div className="p-6 animate-pulse">
+  <div className="flex items-center justify-between mb-4">
+    <h2 className="text-xl font-semibold">Leads</h2>
+    <div className="flex space-x-2">
+      <div className="w-64 h-10 bg-gray-200 rounded-md"></div>
+      <div className="w-32 h-10 bg-gray-200 rounded-md"></div>
+      <div className="w-24 h-10 bg-gray-200 rounded-md"></div>
+    </div>
+  </div>
+  <div className="rounded-xl border p-4">
+    <div className="grid grid-cols-8 font-medium text-sm text-muted-foreground border-b pb-2 mb-2">
+      <div><div className="w-4 h-4 bg-gray-200 rounded"></div></div>
+      <div className="col-span-1">Lead Name</div>
+      <div className="col-span-2">Email ID</div>
+      <div>Contact No.</div>
+      <div>Coupon Code</div>
+      <div>Status</div>
+      <div>Actions</div>
+    </div>
+
+    {/* Repeat this block to show multiple loading rows */}
+    {Array.from({ length: 6 }).map((_, i) => (
+      <div key={i} className="grid grid-cols-8 items-center py-2 border-b text-sm">
+        <div>
+          <div className="w-4 h-4 bg-gray-200 rounded" />
+        </div>
+        <div className="col-span-1">
+          <div className="h-4 bg-gray-200 rounded w-24" />
+        </div>
+        <div className="col-span-2">
+          <div className="h-4 bg-gray-200 rounded w-32" />
+        </div>
+        <div>
+          <div className="h-4 bg-gray-200 rounded w-20" />
+        </div>
+        <div>
+          <div className="h-4 bg-gray-200 rounded w-20" />
+        </div>
+        <div>
+          <div className="h-4 bg-gray-200 rounded w-16" />
+        </div>
+        <div className="flex space-x-2">
+          <div className="w-4 h-4 bg-gray-200 rounded" />
+          <div className="w-4 h-4 bg-gray-200 rounded" />
+          <div className="w-4 h-4 bg-gray-200 rounded" />
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
 }
